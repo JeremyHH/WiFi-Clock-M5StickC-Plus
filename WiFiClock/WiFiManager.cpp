@@ -143,6 +143,8 @@ String getSsidPasswd(String ssidPasswd) {
   if (ssidPasswd == "PASS") {
     return String(reinterpret_cast<const char*>(conf.sta.password));
   }
+
+  return "";
 }
 
 bool isWiFiConnected() { return WiFi.status() == WL_CONNECTED; }
