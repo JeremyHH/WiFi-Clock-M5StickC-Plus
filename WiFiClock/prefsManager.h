@@ -1,7 +1,7 @@
 #ifndef PREFSMANAGER
 #define PREFSMANAGER
 
-#include <M5StickCPlus.h>
+#include <WString.h>
 
 void wipeWiFiData();
 String getPrefsSsidPasswd(String ssidPasswd);

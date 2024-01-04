@@ -1,10 +1,10 @@
 #ifndef WIFIMANAGER
 #define WIFIMANAGER
 
-#include <M5StickCPlus.h>
-
 #include "WiFiType.h"
-#include "esp_wifi.h"
+#include <M5Unified.h>
+#include <esp_wifi.h>
+#include <WString.h>
 
 void initWiFi();
 void initWiFiSmartConfig();

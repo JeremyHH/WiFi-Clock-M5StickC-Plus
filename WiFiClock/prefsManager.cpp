@@ -1,6 +1,5 @@
 #include "prefsManager.h"
 
-#include <M5StickCPlus.h>
 #include <Preferences.h>
 
 Preferences preferences;

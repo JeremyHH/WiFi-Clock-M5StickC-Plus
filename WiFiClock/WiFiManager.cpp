@@ -1,6 +1,6 @@
 #include "WiFiManager.h"
 
-#include <M5StickCPlus.h>
+#include <M5StickCPlus2.h>
 
 #include "WiFi.h"
 #include "WiFiType.h"
@@ -62,7 +62,7 @@ void initWiFi() {
         ESP.restart();
       }
 
-      if (M5.BtnB.wasPressed() || M5.Axp.GetBtnPress()) {
+      if (M5.BtnB.wasPressed() || M5.BtnPWR.wasPressed()) {
         ESP.restart();
       }
       delay(1000);
@@ -71,7 +71,7 @@ void initWiFi() {
 
   M5.Lcd.setCursor(10, 60);
   M5.Lcd.println("Successfuly connected to: " + ssid);
-
+https://www.loginradius.com/blog/engineering/eol-end-of-line-or-newline-characters/
   setWiFiMaxPowerSave();
 }
 
@@ -82,6 +82,7 @@ void initWiFiSmartConfig() {
   M5.Lcd.println("Waiting for SmartConfig");
 
   while (!WiFi.smartConfigDone()) {
+    Serial.print("Waiting for SmartConfig...\r");
     delay(500);
   }
 

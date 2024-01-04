@@ -1,13 +1,14 @@
 #ifndef TIMEMANAGER
 #define TIMEMANAGER
 
-#include <M5StickCPlus.h>
-#include <time.h>
+#include <M5Unified.h>
+
+using namespace m5;
 
 void timeManagerbegin();
 void syncRTCToNTP();
 time_t getTimestampFromRTC();
-RTC_TimeTypeDef getTime();
-RTC_DateTypeDef getDate();
+rtc_time_t getTime();
+rtc_date_t getDate();
 
 #endif
