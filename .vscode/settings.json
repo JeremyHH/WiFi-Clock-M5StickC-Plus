@@ -12,5 +12,17 @@
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
         "build/" : true
+    },
+    "files.associations": {
+        "*.py": "python",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "random": "cpp",
+        "array": "cpp",
+        "initializer_list": "cpp"
     }
 }
