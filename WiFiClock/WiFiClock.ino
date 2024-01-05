@@ -4,12 +4,13 @@
 #include "esp32-hal-cpu.h"
 #include "prefsManager.h"
 #include "timeManager.h"
+#include "Pictures/night_pict.h"
 
 #define IDLE_BRIGHTNESS_LEVEL_PERCENT 5
 #define ACTIVE_BRIGHTNESS_LEVEL_PERCENT 100
 
-static rtc_date_t previousDate;
-static rtc_time_t previousTime;
+const rtc_time_t  night_time(20, 00);
+const rtc_time_t  day_time(07, 30);
 
 void setup()
 {
@@ -42,6 +43,8 @@ void setup()
 
 void loop()
 {
+  static rtc_date_t previousDate;
+  static rtc_time_t previousTime;
 
   //@Todo: Increase brightness if main button has been pressed
 
@@ -70,8 +73,6 @@ void loop()
 
   if (newTime || newDate)
   {
-    M5.Lcd.fillScreen(TFT_BLACK);
-
     String minutes = String(timeNow.minutes);
     String hours = String(timeNow.hours);
 
@@ -86,10 +87,7 @@ void loop()
     }
 
     String timeToPrint = hours + ":" + minutes;
-
-    M5.Lcd.setTextSize(7);
-    M5.Lcd.drawString(timeToPrint, 15, 20, 1);
-
+   
     String day = String(dateNow.date);
     if (dateNow.date < 10)
     {
@@ -106,10 +104,31 @@ void loop()
 
     String ddmmyyyy = day + "/" + month + "/" + String(dateNow.year);
 
-    M5.Lcd.setTextSize(3);
-    M5.Lcd.drawString(ddmmyyyy, 30, 80, 1);
+    // Are we day or night
+    t_t1_t2_compare_res_t t_t1_t2_res = t_t1_t2_compareTime(timeNow, day_time, night_time); 
+    
+    if ((t_t1_t2_res == T_BEFORE_T1) || (t_t1_t2_res == T_AFTER_T2))
+    {
+        // Display the night picture
+        M5.Lcd.pushImage(0, 0, M5.Lcd.width(), M5.Lcd.height() , night_pict);
+        Serial.write("[N]");
+    }
+    else
+    {
+        Serial.write("[D]");
 
-    Serial.write("Time update : ");
+        /*****************/
+        /* Screen update */
+        /*****************/
+
+        M5.Lcd.fillScreen(TFT_BLACK);
+        M5.Lcd.setTextSize(7);
+        M5.Lcd.drawString(timeToPrint, 15, 20, 1);
+        M5.Lcd.setTextSize(3);
+        M5.Lcd.drawString(ddmmyyyy, 30, 80, 1);
+    }
+
+    Serial.write(" ");
     Serial.write(ddmmyyyy.c_str());
     Serial.write(" ");
     Serial.write(timeToPrint.c_str());
