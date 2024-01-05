@@ -9,8 +9,10 @@ const char* ntpServer = "pool.ntp.org";
 
 void timeManagerbegin() {
   M5.Rtc.begin();
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
+  // Config ntp server with Europe/Paris timezone
+  configTzTime("CET-1CEST,M3.5.0,M10.5.0/3", ntpServer);
+  
   syncRTCToNTP();
 }
 
