@@ -4,6 +4,7 @@
 #include "esp32-hal-cpu.h"
 #include "prefsManager.h"
 #include "timeManager.h"
+#include "Pictures/day_pict.h"
 #include "Pictures/night_pict.h"
 
 #define IDLE_BRIGHTNESS_LEVEL_PERCENT 5
@@ -107,6 +108,7 @@ void loop()
     // Are we day or night
     t_t1_t2_compare_res_t t_t1_t2_res = t_t1_t2_compareTime(timeNow, day_time, night_time); 
     
+    M5.Lcd.setSwapBytes(true);
     if ((t_t1_t2_res == T_BEFORE_T1) || (t_t1_t2_res == T_AFTER_T2))
     {
         // Display the night picture
@@ -115,6 +117,8 @@ void loop()
     }
     else
     {
+        // Display the day picture
+        M5.Lcd.pushImage(0, 0, M5.Lcd.width(), M5.Lcd.height() , day_pict);
         Serial.write("[D]");
 
         /*****************/
@@ -127,6 +131,7 @@ void loop()
         M5.Lcd.setTextSize(3);
         M5.Lcd.drawString(ddmmyyyy, 30, 80, 1);
     }
+    M5.Lcd.setSwapBytes(false);
 
     Serial.write(" ");
     Serial.write(ddmmyyyy.c_str());
