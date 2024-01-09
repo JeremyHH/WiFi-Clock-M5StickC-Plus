@@ -5,6 +5,15 @@
 
 using namespace m5;
 
+typedef enum 
+{
+  STATE_UNKNOWN,
+  STATE_DAY_IDLE,
+  STATE_DAY_ACTIVE,
+  STATE_NIGHT_IDLE,
+  STATE_NIGHT_ACTIVE
+}  app_state_t;
+
 typedef enum {
   T_BEFORE_T1,
   T_EQUAL_T1,

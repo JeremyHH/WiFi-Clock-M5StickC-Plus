@@ -23,6 +23,9 @@
         "string_view": "cpp",
         "random": "cpp",
         "array": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "*.scpp": "cpp",
+        "chrono": "c",
+        "list": "cpp"
     }
 }
