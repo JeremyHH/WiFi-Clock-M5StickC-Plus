@@ -3,7 +3,6 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include "timeManager.h"
-#include "errors.h"
 
 WiFiUDP ntpUDP;
 
