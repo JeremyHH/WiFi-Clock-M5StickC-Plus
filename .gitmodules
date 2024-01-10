@@ -1,0 +1,3 @@
+[submodule "Wifi-Clock-Lib"]
+	path = Wifi-Clock-Lib
+	url = https://github.com/JeremyHH/Wifi-Clock-Lib.git
