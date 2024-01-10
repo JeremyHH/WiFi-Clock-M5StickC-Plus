@@ -222,6 +222,7 @@
                 "/home/pi/Arduino/libraries/M5GFX/src",
                 "/home/pi/.arduino15/packages/m5stack/hardware/esp32/2.0.9/libraries/WiFi/src",
                 "/home/pi/.arduino15/packages/m5stack/hardware/esp32/2.0.9/libraries/Preferences/src",
+                "/home/pi/Arduino/libraries/NTPClient",
                 "/home/pi/.arduino15/packages/m5stack/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/xtensa-esp32-elf/include/c++/8.4.0",
                 "/home/pi/.arduino15/packages/m5stack/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/xtensa-esp32-elf/include/c++/8.4.0/xtensa-esp32-elf",
                 "/home/pi/.arduino15/packages/m5stack/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/xtensa-esp32-elf/include/c++/8.4.0/backward",
