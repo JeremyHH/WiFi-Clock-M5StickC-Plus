@@ -41,5 +41,6 @@ t_t1_t2_compare_res_t t_t1_t2_compareTime(const rtc_time_t& t,
                                       const rtc_time_t& t1,
                                       const rtc_time_t& t2);
 
+unsigned int t2_minus_t1(const rtc_time_t &t1, const rtc_time_t &t2);
 
 #endif

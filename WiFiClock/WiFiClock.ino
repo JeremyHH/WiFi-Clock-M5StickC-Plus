@@ -95,6 +95,26 @@ void displayDateAndTime(const rtc_date_t &newDate, const rtc_time_t &newTime)
   M5.Lcd.drawString(timeToString(newTime), 15, 20, 1);
   M5.Lcd.setTextSize(3);
   M5.Lcd.drawString(dateToString(newDate), 30, 80, 1);
+
+  float progress = -1;
+
+  if (appState == STATE_NIGHT_ACTIVE)
+  {
+    progress = t2_minus_t1(currentTime, day_time);
+    progress /= t2_minus_t1(night_time, day_time);
+    progress *= 100;
+  }
+  else if (appState == STATE_DAY_ACTIVE)
+  {
+    progress = t2_minus_t1(currentTime, night_time);
+    progress /= t2_minus_t1(day_time, night_time);
+    progress *= 100;
+  }
+
+  if (progress > 0)
+  {
+    M5.Lcd.progressBar(0, 0, M5.Lcd.width(), /* height */ 10, (unsigned int)progress);
+  }
 }
 
 void logNewState(const app_state_t newState)

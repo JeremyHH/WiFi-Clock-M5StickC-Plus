@@ -80,6 +80,34 @@ rtc_date_t getDate()
   return dateNow;
 }
 
+unsigned int seconds_from_midnight(const rtc_time_t &t)
+{
+  return t.hours*60*60 + t.minutes*60 + t.seconds;
+}
+
+unsigned int seconds_upto_midnight(const rtc_time_t &t)
+{
+  return 24*60*60 - seconds_from_midnight(t);
+}
+
+unsigned int t2_minus_t1(const rtc_time_t &t1, const rtc_time_t &t2)
+{
+  t1_t2_compare_res_t res = t1_t2_compareTime(t1, t2);
+
+  switch(res)
+  {
+    case T1_BEFORE_T2 :
+      return seconds_from_midnight(t2) - seconds_from_midnight(t1);
+      break;
+    case T1_EQUAL_T2 :
+      return 0;
+      break;
+    case T1_AFTER_T2 :
+      return seconds_upto_midnight(t1) + seconds_from_midnight(t2);
+      break;
+  }
+}
+
 t1_t2_compare_res_t t1_t2_compareTime(const rtc_time_t &t1,
                                       const rtc_time_t &t2)
 {
