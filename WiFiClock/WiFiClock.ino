@@ -9,11 +9,27 @@
 
 #define IDLE_BRIGHTNESS_LEVEL_PERCENT 5
 #define ACTIVE_BRIGHTNESS_LEVEL_PERCENT 80
+#define PROGRESSBAR_HEIGHT 10
+#define PROGRESSBAR_MARGIN 2
 #define ACTIVE_DURATION_S 10
-#undef SHOW_DAY_TIME
 
-const rtc_time_t night_time(20, 00);
-const rtc_time_t day_time(07, 30);
+const rtc_time_t day_time[7] = {
+    rtc_time_t(07, 45),
+    rtc_time_t(07, 15),
+    rtc_time_t(07, 15),
+    rtc_time_t(07, 15),
+    rtc_time_t(07, 15),
+    rtc_time_t(07, 15),
+    rtc_time_t(07, 45)};
+
+const rtc_time_t night_time[7] = {
+    rtc_time_t(20, 00),
+    rtc_time_t(20, 00),
+    rtc_time_t(20, 00),
+    rtc_time_t(20, 00),
+    rtc_time_t(20, 00),
+    rtc_time_t(20, 30),
+    rtc_time_t(20, 30)};
 
 static app_state_t appState = STATE_UNKNOWN;
 static unsigned long buttonPressedTimestamp = 0;
@@ -77,6 +93,26 @@ String timeToString(const rtc_time_t &newTime)
   return timeToPrint;
 }
 
+float getEnergyGauge()
+{
+  float ret = -1;
+
+  if ((appState == STATE_NIGHT_ACTIVE) || (appState == STATE_NIGHT_IDLE))
+  {
+    ret = t2_minus_t1(night_time[currentDate.weekDay], currentTime);
+    ret /= t2_minus_t1(night_time[currentDate.weekDay], day_time[currentDate.weekDay]);
+    ret *= 100;
+  }
+  else if ((appState == STATE_DAY_ACTIVE) || (appState == STATE_DAY_IDLE))
+  {
+    ret = t2_minus_t1(currentTime, night_time[currentDate.weekDay]);
+    ret /= t2_minus_t1(day_time[currentDate.weekDay], night_time[currentDate.weekDay]);
+    ret *= 100;
+  }
+
+  return ret;
+}
+
 void logDateAndTime(const rtc_date_t &newDate, const rtc_time_t &newTime)
 {
   // Serial output
@@ -84,37 +120,78 @@ void logDateAndTime(const rtc_date_t &newDate, const rtc_time_t &newTime)
   Serial.write(dateToString(newDate).c_str());
   Serial.write(" ");
   Serial.write(timeToString(newTime).c_str());
-  Serial.write("\n");
+
+  float energyGauge = getEnergyGauge();
+
+  Serial.write(" (");
+  Serial.write(String(energyGauge).c_str());
+  Serial.write("%)\n");
+}
+
+void displayProgressBar(int x, int y, int w, int h, uint8_t val, const unsigned int color = 0x09F1)
+{
+  M5.Lcd.drawRect(x, y, w, h, color);
+  M5.Lcd.fillRect(x + 1, y + 1, w * (((float)val) / 100.0f), h - 1, color);
 }
 
 void displayDateAndTime(const rtc_date_t &newDate, const rtc_time_t &newTime)
 {
-  // M5.Lcd.fillScreen(lgfx::color888(0xFF, 0xB2, 0x1D));
+
+  float energyGauge = getEnergyGauge();
+  uint32_t color = TFT_WHITE;
+
+  // Clear screen
   M5.Lcd.fillScreen(TFT_BLACK);
+
+  // Display energy gauge
+  if (energyGauge >= 0)
+  {
+    if ((appState == STATE_DAY_ACTIVE) || (appState == STATE_DAY_IDLE))
+    {
+      if (energyGauge < 2.0)
+      {
+        color = TFT_RED;
+      }
+      else if (energyGauge < 5.0)
+      {
+        color = TFT_ORANGE;
+      }
+      else if (energyGauge > 90.0)
+      {
+        color = TFT_GREEN;
+      }
+    }
+    else if ((appState == STATE_NIGHT_ACTIVE) || (appState == STATE_NIGHT_IDLE))
+    {
+      if (energyGauge > 98.0)
+      {
+        color = TFT_GREEN;
+      }
+      else if (energyGauge > 95.0)
+      {
+        color = TFT_ORANGE;
+      }
+      else
+      {
+        color = TFT_RED;
+      }
+    }
+
+    displayProgressBar(PROGRESSBAR_MARGIN,
+                       M5.Lcd.height() - (PROGRESSBAR_MARGIN + PROGRESSBAR_HEIGHT),
+                       M5.Lcd.width() - 2 * PROGRESSBAR_MARGIN,
+                       PROGRESSBAR_HEIGHT,
+                       (unsigned int)energyGauge,
+                       M5.Lcd.color16to24(color));
+  }
+
+  // Display Date and time
+  M5.Lcd.setTextColor(M5.Lcd.color16to24(color), TFT_BLACK);
+  // M5.Lcd.fillScreen(lgfx::color888(0xFF, 0xB2, 0x1D));
   M5.Lcd.setTextSize(7);
   M5.Lcd.drawString(timeToString(newTime), 15, 20, 1);
   M5.Lcd.setTextSize(3);
   M5.Lcd.drawString(dateToString(newDate), 30, 80, 1);
-
-  float progress = -1;
-
-  if (appState == STATE_NIGHT_ACTIVE)
-  {
-    progress = t2_minus_t1(currentTime, day_time);
-    progress /= t2_minus_t1(night_time, day_time);
-    progress *= 100;
-  }
-  else if (appState == STATE_DAY_ACTIVE)
-  {
-    progress = t2_minus_t1(currentTime, night_time);
-    progress /= t2_minus_t1(day_time, night_time);
-    progress *= 100;
-  }
-
-  if (progress > 0)
-  {
-    M5.Lcd.progressBar(0, 0, M5.Lcd.width(), /* height */ 10, (unsigned int)progress);
-  }
 }
 
 void logNewState(const app_state_t newState)
@@ -230,7 +307,7 @@ bool handleTimeUpdate()
   logDateAndTime(currentDate, currentTime);
 
   // Are we day or night
-  t_t1_t2_compare_res_t t_t1_t2_res = t_t1_t2_compareTime(currentTime, day_time, night_time);
+  t_t1_t2_compare_res_t t_t1_t2_res = t_t1_t2_compareTime(currentTime, day_time[currentDate.weekDay], night_time[currentDate.weekDay]);
 
   if ((t_t1_t2_res == T_BEFORE_T1) || (t_t1_t2_res == T_AFTER_T2))
   {
@@ -330,7 +407,6 @@ void setup()
 
   M5.Lcd.setCursor(0, 0, 2);
   M5.Lcd.setCursor(10, 70);
-  M5.Lcd.setTextColor(TFT_WHITE);
 
   // Set RTC from NTP and then disconnect from wifi
   timeManagerbegin();
